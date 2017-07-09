@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=UTF-8>
+        <title>Tomcat WebSocket Chat</title>
+        <script>
+
+
+            var ws;
+            function connectToServer() {
+
+
+                ws = new WebSocket("ws://localhost:8084/pgaync/chat/" + document.getElementById("name").value);
+                ws.onopen = function () {
+                };
+                ws.onmessage = function (message) {
+                 
+                    document.getElementById("chatlog").textContent += message.data + "\n";
+                };
+            }
+            function postToServer() {
+                  var obj = {
+                        name : document.getElementById("name").value,
+                        content : document.getElementById("msg").value
+                    }
+                   console.log(obj);
+                ws.send(JSON.stringify(obj));
+                document.getElementById("msg").value = "";
+            }
+            function closeConnect() {
+                ws.close();
+            }
+        </script>
+    </head>
+    <body>
+        <label>Name</label> <input id="name" type="text" />
+
+        <button type="submit" id="connect" onClick="connectToServer()">Connect!</button>
+        <br>
+        <textarea id="chatlog" readonly cols="100" rows="30"></textarea><br/>
+        <input id="msg" type="text" />
+        <button type="submit" id="sendButton" onClick="postToServer()">Send!</button>
+        <button type="submit" id="sendButton" onClick="closeConnect()">End</button>
+    </body>
+</html>
