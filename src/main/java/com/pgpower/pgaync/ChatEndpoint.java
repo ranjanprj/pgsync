@@ -1,19 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.pgpower.pgaync;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -29,7 +28,7 @@ import org.postgresql.PGConnection;
         decoders = MessageDecoder.class,
         encoders = MessageEncoder.class)
 public class ChatEndpoint {
-
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Session session;
     private static Set<ChatEndpoint> chatEndpoints
             = new CopyOnWriteArraySet<>();
@@ -121,16 +120,12 @@ public class ChatEndpoint {
                 if (notifications != null) {
                     for (int i = 0; i < notifications.length; i++) {
                         if (Long.valueOf(notifications[i].getParameter()) != (prev + 1)) {
-                            System.out.println("**************************************");
-
-                            System.out.println("**************************************");
-
-                            System.out.println("**************************************");
+                            System.out.println("**************************************");                         
                         } else {
                             prev = Long.valueOf(notifications[i].getParameter());
                         }
                         System.out.println("Got notification: " + notifications[i].getName() + notifications[i].getParameter());
-                        message.setContent("Got notification: " + notifications[i].getName() + notifications[i].getParameter());
+                        message.setContent( notifications[i].getParameter());
                         broadcast(message);
                     }
                 }
@@ -138,11 +133,31 @@ public class ChatEndpoint {
                 // wait a while before checking again for new
                 // notifications
                 Thread.sleep(2000);
+                
+                
+                
+                
             } catch (SQLException | InterruptedException sqle) {
                 sqle.printStackTrace();
             }
+            
+            
+           
         }
 
         //------------------------------------------
     }
+}
+
+
+class MyListener extends Thread{
+    @Override
+    public void run() {
+        try {
+            this.sleep(2000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MyListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
 }
