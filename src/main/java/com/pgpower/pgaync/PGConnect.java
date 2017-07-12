@@ -23,7 +23,7 @@ public class PGConnect {
                 Class.forName("org.postgresql.Driver");
                 c = DriverManager
                         .getConnection("jdbc:postgresql://localhost:5432/postgres",
-                                "postgres", "Linuxlove01");
+                                "<UID>", "<PWD>");
             }
 
             return c;

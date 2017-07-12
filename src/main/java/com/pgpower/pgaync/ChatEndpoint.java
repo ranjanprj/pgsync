@@ -28,6 +28,7 @@ import org.postgresql.PGConnection;
         decoders = MessageDecoder.class,
         encoders = MessageEncoder.class)
 public class ChatEndpoint {
+
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Session session;
     private static Set<ChatEndpoint> chatEndpoints
@@ -48,17 +49,16 @@ public class ChatEndpoint {
         message.setContent("Connected!");
         broadcast(message);
         saySomething();
-       
+
     }
 
     @OnMessage
     public void onMessage(Session session, Message message)
             throws IOException, EncodeException, SQLException, ClassNotFoundException {
         message.setFrom(users.get(session.getId()));
-        
-         broadcast(message);
-        
-        
+
+        broadcast(message);
+
     }
 
     @OnClose
@@ -91,9 +91,18 @@ public class ChatEndpoint {
         });
     }
 
-    private static void saySomething() throws IOException, EncodeException, InterruptedException, SQLException, ClassNotFoundException {
-       System.out.println("ON MESSAGE CALLED");
-       Message message = new Message();
+    private void saySomething() throws IOException, EncodeException, InterruptedException, SQLException, ClassNotFoundException {
+
+       Future<Integer> value = executorService.submit(new Callable<Integer>() {
+            @Override
+            public Integer call() {
+                System.out.println("FUTURE CALLBACK CALLED");
+                return 2;
+            }
+        });
+
+        System.out.println("ON MESSAGE CALLED");
+        Message message = new Message();
 //        broadcast(message);
         //----------------------------------------
         Class.forName("org.postgresql.Driver");
@@ -108,6 +117,7 @@ public class ChatEndpoint {
         PGConnection pgconn = (org.postgresql.PGConnection) PGConnect.getConnection();
         long prev = 0l;
         while (true) {
+       
             try {
                 // issue a dummy query to contact the backend
                 // and receive any pending notifications.
@@ -120,12 +130,12 @@ public class ChatEndpoint {
                 if (notifications != null) {
                     for (int i = 0; i < notifications.length; i++) {
                         if (Long.valueOf(notifications[i].getParameter()) != (prev + 1)) {
-                            System.out.println("**************************************");                         
+                            System.out.println("**************************************");
                         } else {
                             prev = Long.valueOf(notifications[i].getParameter());
                         }
                         System.out.println("Got notification: " + notifications[i].getName() + notifications[i].getParameter());
-                        message.setContent( notifications[i].getParameter());
+                        message.setContent(notifications[i].getParameter());
                         broadcast(message);
                     }
                 }
@@ -133,24 +143,19 @@ public class ChatEndpoint {
                 // wait a while before checking again for new
                 // notifications
                 Thread.sleep(2000);
-                
-                
-                
-                
+
             } catch (SQLException | InterruptedException sqle) {
                 sqle.printStackTrace();
             }
-            
-            
-           
+
         }
 
         //------------------------------------------
     }
 }
 
+class MyListener extends Thread {
 
-class MyListener extends Thread{
     @Override
     public void run() {
         try {
@@ -159,5 +164,5 @@ class MyListener extends Thread{
             Logger.getLogger(MyListener.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }

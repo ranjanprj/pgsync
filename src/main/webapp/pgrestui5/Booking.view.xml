@@ -1,0 +1,39 @@
+<core:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m" controllerName="pgrestui5.Booking" xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page title="Demo showing listen/Notify Websocket update from Postgresql">
+		<content>
+			<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+				header="Postgres WS Notify" subheader="Expenses" frameType="OneByOne"
+				press="press">
+				<tileContent>
+					<TileContent unit="Unit" footer="">
+						<content>
+							<NumericContent value="{msg>/content}" icon="sap-icon://line-charts" />
+						</content>
+					</TileContent>
+				</tileContent>
+			</GenericTile>
+
+			<VBox fitContainer="true" justifyContent="Center" alignItems="Center">
+				<HBox fitContainer="true" justifyContent="Center" alignItems="Center">
+					<Input id="bntSearch" class="controls" type="text"
+						placeholder="Search Box" />
+					<Button id="button" text="search" press="onAfterRendering" />
+					<Button id="Distance" text="Distance" press="onDistancePress" />
+				</HBox>
+				<HBox fitContainer="true" justifyContent="Center" alignItems="Center">
+					<Input id="FromDis" placeholder="From" visible="false" />
+					<Input id="ToDis" placeholder="To" visible="false" />
+					<Button id="Okay" text="Ok" visible="false" press="onOkayPress" />
+				</HBox>
+				<HBox id="map_canvas" fitContainer="true" justifyContent="Center"
+					alignItems="Center">
+
+				</HBox>
+			</VBox>
+			<!-- <List headerText="{i18n>invoiceListTitle}" class="sapUiResponsiveMargin" 
+				width="auto" items="{booking>/}" > <items> <ObjectListItem title="{booking>booked_by}"/> 
+				</items> </List> -->
+		</content>
+	</Page>
+</core:View>
